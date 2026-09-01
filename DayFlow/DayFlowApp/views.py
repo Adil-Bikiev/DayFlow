@@ -84,7 +84,9 @@ def task_create(request):
             return redirect('task_list')
     else:
         form = TaskForm()
-    return render(request, 'DayFlowApp/task_form.html', {'form': form, 'heading': 'Новая задача', 'is_edit': False})
+    return render(request, 'DayFlowApp/task_form.html', {
+        'form': form, 'heading': 'Новая задача', 'is_edit': False
+    })
 
 
 @login_required
@@ -98,7 +100,9 @@ def task_edit(request, task_id):
             return redirect('task_list')
     else:
         form = TaskForm(instance=task)
-    return render(request, 'DayFlowApp/task_form.html', {'form': form, 'heading': 'Редактировать задачу', 'is_edit': True})
+    return render(request, 'DayFlowApp/task_form.html', {
+        'form': form, 'heading': 'Редактировать задачу', 'is_edit': True
+    })
 
 
 @login_required
