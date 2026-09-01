@@ -18,13 +18,6 @@
 {% if tasks %}
   {% for task in tasks %}
     <div class="task-card {% if task.id in completed_ids %}done{% endif %}">
-      <form action="{% url 'toggle_complete' task.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit" class="check-circle {% if task.id in completed_ids %}checked{% endif %}" title="Отметить выполненной">
-          {% if task.id in completed_ids %}✓{% endif %}
-        </button>
-      </form>
-
       <div class="task-time">{{ task.time|time:"H:i" }}</div>
 
       <div class="flex-grow-1">
@@ -40,8 +33,14 @@
       </div>
 
       <div class="task-actions">
-        <a href="{% url 'task_edit' task.id %}" class="icon-btn" title="Редактировать">✏️</a>
         <a href="{% url 'task_delete' task.id %}" class="icon-btn" title="Удалить">🗑️</a>
+        <a href="{% url 'task_edit' task.id %}" class="icon-btn" title="Редактировать">✏️</a>
+        <form action="{% url 'toggle_complete' task.id %}" method="post" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="check-circle {% if task.id in completed_ids %}checked{% endif %}" title="Отметить выполненной">
+            {% if task.id in completed_ids %}✓{% endif %}
+          </button>
+        </form>
       </div>
     </div>
   {% endfor %}
