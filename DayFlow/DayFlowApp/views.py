@@ -116,4 +116,4 @@ def task_delete(request, task_id):
     return render(request, 'DayFlowApp/task_confirm_delete.html', {'task': task})
 
 def custom_page_not_found_view(request, exception):
-    return render(request, '404.html', status=404)
+    return render(request, '404.html', {'exception': str(exception)}, status=404)

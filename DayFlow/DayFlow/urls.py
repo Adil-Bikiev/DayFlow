@@ -8,4 +8,4 @@ urlpatterns = [
     path('', include('DayFlowApp.urls')),
 ]
 
-
+handler404 = 'DayFlowApp.views.custom_page_not_found_view'
