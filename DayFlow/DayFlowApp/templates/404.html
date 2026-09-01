@@ -1,0 +1,17 @@
+{% extends 'DayFlowApp/base.html' %}
+{% block title %}Страница не найдена — DayFlow{% endblock %}
+{% block content %}
+
+<div class="glass-card" style="max-width:480px;margin:60px auto;text-align:center;">
+  <div style="font-size:4rem;line-height:1;">🌙</div>
+  <div class="hero-title mb-2" style="font-size:1.8rem;">404 — страница потерялась</div>
+  <p class="text-muted mb-4" style="color:var(--text-muted);">
+    Такой страницы не существует, либо она была перемещена.<br>
+    Но твои задачи никуда не делись 🌸
+  </p>
+  <a href="{% if user.is_authenticated %}{% url 'task_list' %}{% else %}{% url 'login' %}{% endif %}" class="btn-gradient">
+    ← Вернуться на главную
+  </a>
+</div>
+
+{% endblock %}

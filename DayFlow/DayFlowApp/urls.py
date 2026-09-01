@@ -11,7 +11,14 @@ urlpatterns = [
     path('tasks/<int:task_id>/delete/', views.task_delete, name='task_delete'),
     path('tasks/<int:task_id>/toggle/', views.toggle_complete, name='toggle_complete'),
 
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='DayFlowApp/login.html'), name='login'),
+    path(
+        'accounts/login/',
+        auth_views.LoginView.as_view(
+            template_name='DayFlowApp/login.html',
+            redirect_authenticated_user=True,   # <-- ключевая правка
+        ),
+        name='login',
+    ),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('accounts/register/', views.register, name='register'),
 ]

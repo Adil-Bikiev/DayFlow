@@ -14,22 +14,25 @@
   <div class="bg-blob blob-2"></div>
   <div class="bg-blob blob-3"></div>
 
-  {% if user.is_authenticated %}
   <nav class="navbar-glass">
     <div class="container d-flex justify-content-between align-items-center">
-      <a class="brand" href="{% url 'task_list' %}">✨ DayFlow</a>
+      <a class="brand" href="{% if user.is_authenticated %}{% url 'task_list' %}{% else %}{% url 'login' %}{% endif %}">✨ DayFlow</a>
       <div class="d-flex align-items-center gap-2">
-        <a class="nav-link-custom" href="{% url 'task_list' %}">Сегодня</a>
-        <a class="nav-link-custom" href="{% url 'all_tasks' %}">Все задачи</a>
-        <span class="nav-link-custom">👋 {{ user.username }}</span>
-        <form action="{% url 'logout' %}" method="post" class="d-inline">
-          {% csrf_token %}
-          <button type="submit" class="nav-link-custom border-0 bg-transparent">Выйти</button>
-        </form>
+        {% if user.is_authenticated %}
+          <a class="nav-link-custom" href="{% url 'task_list' %}">Сегодня</a>
+          <a class="nav-link-custom" href="{% url 'all_tasks' %}">Все задачи</a>
+          <span class="nav-link-custom">👋 {{ user.username }}</span>
+          <form action="{% url 'logout' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="nav-link-custom border-0 bg-transparent">Выйти</button>
+          </form>
+        {% else %}
+          <a class="nav-link-custom" href="{% url 'login' %}">Войти</a>
+          <a class="nav-link-custom" href="{% url 'register' %}">Регистрация</a>
+        {% endif %}
       </div>
     </div>
   </nav>
-  {% endif %}
 
   <div class="page-wrap">
     {% if messages %}
