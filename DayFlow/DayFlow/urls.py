@@ -8,6 +8,4 @@ urlpatterns = [
     path('', include('DayFlowApp.urls')),
 ]
 
-if settings.DEBUG is False:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    # для этого перед проверкой выполни: python manage.py collectstatic
+

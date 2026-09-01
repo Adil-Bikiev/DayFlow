@@ -114,3 +114,6 @@ def task_delete(request, task_id):
         messages.success(request, f'Задача «{title}» удалена.')
         return redirect('all_tasks')
     return render(request, 'DayFlowApp/task_confirm_delete.html', {'task': task})
+
+def custom_page_not_found_view(request, exception):
+    return render(request, '404.html', status=404)
