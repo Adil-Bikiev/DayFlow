@@ -1,0 +1,16 @@
+{% extends 'DayFlowApp/base.html' %}
+{% block title %}Удалить задачу — DayFlow{% endblock %}
+{% block content %}
+
+<div class="glass-card" style="max-width:480px;margin:0 auto;text-align:center;">
+  <div style="font-size:2.5rem;">🗑️</div>
+  <div class="hero-title mb-2" style="font-size:1.35rem;">Удалить «{{ task.title }}»?</div>
+  <p class="text-muted mb-4">Это действие нельзя отменить.</p>
+  <form method="post" class="d-flex justify-content-center gap-2">
+    {% csrf_token %}
+    <button type="submit" class="btn-gradient border-0">Да, удалить</button>
+    <a href="{% url 'all_tasks' %}" class="btn-soft">Отмена</a>
+  </form>
+</div>
+
+{% endblock %}

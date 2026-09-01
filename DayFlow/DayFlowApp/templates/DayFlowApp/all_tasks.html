@@ -1,0 +1,39 @@
+{% extends 'DayFlowApp/base.html' %}
+{% block title %}Все задачи — DayFlow{% endblock %}
+{% block content %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div class="hero-title">Все мои задачи 🗂️</div>
+  <a href="{% url 'task_create' %}" class="btn-gradient">+ Новая задача</a>
+</div>
+
+{% if tasks %}
+  {% for task in tasks %}
+    <div class="task-card">
+      <div class="task-time">{{ task.time|time:"H:i" }}</div>
+      <div class="flex-grow-1">
+        <div class="task-title">{{ task.title }}</div>
+        {% if task.description %}
+          <div class="task-desc">{{ task.description }}</div>
+        {% endif %}
+        {% if task.is_recurring %}
+          <span class="badge-recur">🔁 {{ task.repeat_days_display }}</span>
+        {% else %}
+          <span class="badge-once">📅 {{ task.date|date:"d.m.Y" }}</span>
+        {% endif %}
+      </div>
+      <div class="task-actions">
+        <a href="{% url 'task_edit' task.id %}" class="icon-btn" title="Редактировать">✏️</a>
+        <a href="{% url 'task_delete' task.id %}" class="icon-btn" title="Удалить">🗑️</a>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="glass-card empty-state">
+    <div class="emoji">📝</div>
+    <p class="mb-3">У тебя пока нет ни одной задачи.</p>
+    <a href="{% url 'task_create' %}" class="btn-gradient">+ Добавить задачу</a>
+  </div>
+{% endif %}
+
+{% endblock %}

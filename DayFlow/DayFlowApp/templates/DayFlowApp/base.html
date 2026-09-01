@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}DayFlow{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'DayFlowApp/css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  {% if user.is_authenticated %}
+  <nav class="navbar-glass">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="brand" href="{% url 'task_list' %}">✨ DayFlow</a>
+      <div class="d-flex align-items-center gap-2">
+        <a class="nav-link-custom" href="{% url 'task_list' %}">Сегодня</a>
+        <a class="nav-link-custom" href="{% url 'all_tasks' %}">Все задачи</a>
+        <span class="nav-link-custom">👋 {{ user.username }}</span>
+        <form action="{% url 'logout' %}" method="post" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="nav-link-custom border-0 bg-transparent">Выйти</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  {% endif %}
+
+  <div class="page-wrap">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert-custom {% if message.tags == 'success' %}alert-success-custom{% else %}alert-error-custom{% endif %} mb-3">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

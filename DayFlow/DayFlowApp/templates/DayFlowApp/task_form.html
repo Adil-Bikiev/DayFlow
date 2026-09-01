@@ -1,0 +1,76 @@
+{% extends 'DayFlowApp/base.html' %}
+{% block title %}{{ heading }} — DayFlow{% endblock %}
+{% block content %}
+
+<div class="glass-card" style="max-width:560px;margin:0 auto;">
+  <div class="hero-title mb-4" style="font-size:1.5rem;">{{ heading }}</div>
+
+  {% if form.non_field_errors %}
+    <div class="alert-custom alert-error-custom mb-3">
+      {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      {{ form.title.label_tag }}
+      {{ form.title }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.description.label_tag }}
+      {{ form.description }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.time.label_tag }}
+      {{ form.time }}
+    </div>
+
+    <div class="form-check mb-3 d-flex align-items-center gap-2">
+      {{ form.is_recurring }}
+      <label class="form-check-label mb-0" for="id_is_recurring">{{ form.fields.is_recurring.label }}</label>
+    </div>
+
+    <div class="mb-3" id="recurring-block">
+      <label class="d-block mb-2">{{ form.repeat_days.label }}</label>
+      <div class="weekday-grid">
+        {% for checkbox in form.repeat_days %}
+          <div>{{ checkbox }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="mb-4" id="date-block">
+      {{ form.date.label_tag }}
+      {{ form.date }}
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn-gradient border-0">Сохранить</button>
+      <a href="{% url 'task_list' %}" class="btn-soft">Отмена</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  const recurringCheckbox = document.getElementById('id_is_recurring');
+  const recurringBlock = document.getElementById('recurring-block');
+  const dateBlock = document.getElementById('date-block');
+
+  function toggleBlocks() {
+    if (recurringCheckbox.checked) {
+      recurringBlock.style.display = 'block';
+      dateBlock.style.display = 'none';
+    } else {
+      recurringBlock.style.display = 'none';
+      dateBlock.style.display = 'block';
+    }
+  }
+  recurringCheckbox.addEventListener('change', toggleBlocks);
+  toggleBlocks();
+</script>
+
+{% endblock %}

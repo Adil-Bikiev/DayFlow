@@ -1,0 +1,56 @@
+{% extends 'DayFlowApp/base.html' %}
+{% block title %}Сегодня — DayFlow{% endblock %}
+{% block content %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <div class="hero-title">Привет, {{ user.username }} 🌸</div>
+    <div class="hero-sub">{{ weekday_name }}, {{ today|date:"d.m.Y" }}</div>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    {% if total_count %}
+      <div class="progress-pill">✅ {{ done_count }} / {{ total_count }}</div>
+    {% endif %}
+    <a href="{% url 'task_create' %}" class="btn-gradient">+ Новая задача</a>
+  </div>
+</div>
+
+{% if tasks %}
+  {% for task in tasks %}
+    <div class="task-card {% if task.id in completed_ids %}done{% endif %}">
+      <form action="{% url 'toggle_complete' task.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="check-circle {% if task.id in completed_ids %}checked{% endif %}" title="Отметить выполненной">
+          {% if task.id in completed_ids %}✓{% endif %}
+        </button>
+      </form>
+
+      <div class="task-time">{{ task.time|time:"H:i" }}</div>
+
+      <div class="flex-grow-1">
+        <div class="task-title">{{ task.title }}</div>
+        {% if task.description %}
+          <div class="task-desc">{{ task.description }}</div>
+        {% endif %}
+        {% if task.is_recurring %}
+          <span class="badge-recur">🔁 {{ task.repeat_days_display }}</span>
+        {% else %}
+          <span class="badge-once">📅 разовая</span>
+        {% endif %}
+      </div>
+
+      <div class="task-actions">
+        <a href="{% url 'task_edit' task.id %}" class="icon-btn" title="Редактировать">✏️</a>
+        <a href="{% url 'task_delete' task.id %}" class="icon-btn" title="Удалить">🗑️</a>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="glass-card empty-state">
+    <div class="emoji">🌷</div>
+    <p class="mb-3">На сегодня задач нет. Самое время добавить что-то приятное!</p>
+    <a href="{% url 'task_create' %}" class="btn-gradient">+ Добавить задачу</a>
+  </div>
+{% endif %}
+
+{% endblock %}

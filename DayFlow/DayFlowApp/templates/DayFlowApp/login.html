@@ -1,0 +1,31 @@
+{% extends 'DayFlowApp/base.html' %}
+{% block title %}Вход — DayFlow{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-title">Привет снова 👋</div>
+    <div class="auth-sub">Войди, чтобы увидеть свои задачи</div>
+
+    {% if form.errors %}
+      <div class="alert-custom alert-error-custom mb-3">Неверное имя пользователя или пароль.</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_username">Имя пользователя</label>
+        <input type="text" name="username" id="id_username" class="form-control" placeholder="Имя пользователя" required autofocus>
+      </div>
+      <div class="mb-4">
+        <label for="id_password">Пароль</label>
+        <input type="password" name="password" id="id_password" class="form-control" placeholder="Пароль" required>
+      </div>
+      <button type="submit" class="btn-gradient border-0 w-100 justify-content-center">Войти</button>
+    </form>
+
+    <p class="text-center mt-4 mb-0" style="color:var(--text-muted);">
+      Нет аккаунта? <a class="plain-link" href="{% url 'register' %}">Зарегистрироваться</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
