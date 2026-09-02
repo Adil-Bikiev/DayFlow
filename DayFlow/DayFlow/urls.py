@@ -8,4 +8,7 @@ urlpatterns = [
     path('', include('DayFlowApp.urls')),
 ]
 
+if settings.DEBUG is False:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 handler404 = 'DayFlowApp.views.custom_page_not_found_view'
