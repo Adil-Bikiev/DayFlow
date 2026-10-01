@@ -1,9 +1,18 @@
 from datetime import date as date_cls
+from urllib.parse import quote
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from .forms import RegisterForm, TaskForm
 from .models import Task, TaskCompletion
@@ -17,18 +26,58 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, f'Добро пожаловать, {user.username}! Регистрация прошла успешно 🎉')
-            return redirect('task_list')
+            user = form.save(commit=False)
+            user.is_active = False  # ждём подтверждения почты
+            user.save()
+
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            confirm_url = request.build_absolute_uri(
+                reverse('confirm_email', args=[uid, token])
+            )
+
+            message = render_to_string('DayFlowApp/email/confirm_email.txt', {
+                'user': user,
+                'confirm_url': confirm_url,
+            })
+            send_mail(
+                subject='Подтверди свою почту — DayFlow',
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+            )
+
+            return redirect(f"{reverse('check_email')}?email={quote(user.email)}")
     else:
         form = RegisterForm()
     return render(request, 'DayFlowApp/register.html', {'form': form})
 
 
+def check_email_view(request):
+    email = request.GET.get('email', '')
+    return render(request, 'DayFlowApp/check_email.html', {'email': email})
+
+
+def confirm_email(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        messages.success(request, 'Почта подтверждена! Добро пожаловать в DayFlow 🎉')
+        return redirect('task_list')
+
+    messages.error(request, 'Ссылка подтверждения недействительна или устарела.')
+    return redirect('login')
+
+
 @login_required
 def task_list(request):
-    """Задачи на сегодня — главная страница."""
     today = date_cls.today()
     weekday = today.weekday()
 
@@ -67,7 +116,6 @@ def toggle_complete(request, task_id):
 
 @login_required
 def all_tasks(request):
-    """Список всех задач пользователя для управления."""
     tasks = Task.objects.filter(user=request.user).order_by('-is_recurring', 'time')
     return render(request, 'DayFlowApp/all_tasks.html', {'tasks': tasks})
 
@@ -115,5 +163,6 @@ def task_delete(request, task_id):
         return redirect('all_tasks')
     return render(request, 'DayFlowApp/task_confirm_delete.html', {'task': task})
 
+
 def custom_page_not_found_view(request, exception):
-    return render(request, '404.html', {'exception': str(exception)}, status=404)
+    return render(request, '404.html', status=404)

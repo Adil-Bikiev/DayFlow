@@ -15,11 +15,12 @@ urlpatterns = [
         'accounts/login/',
         auth_views.LoginView.as_view(
             template_name='DayFlowApp/login.html',
-            redirect_authenticated_user=True,   # <-- ключевая правка
+            redirect_authenticated_user=True,
         ),
         name='login',
     ),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('accounts/register/', views.register, name='register'),
+    path('accounts/check-email/', views.check_email_view, name='check_email'),
+    path('accounts/confirm/<uidb64>/<token>/', views.confirm_email, name='confirm_email'),
 ]
-
