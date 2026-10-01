@@ -96,3 +96,14 @@ class RegisterForm(UserCreationForm):
             'class': 'form-control', 'placeholder': 'Повторите пароль'
         })
         self.fields['password2'].help_text = None
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+
+        if not email.endswith('@gmail.com'):
+            raise forms.ValidationError('Регистрация доступна только с почтой @gmail.com.')
+
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('Пользователь с такой почтой уже зарегистрирован.')
+
+        return email
