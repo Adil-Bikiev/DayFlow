@@ -41,7 +41,7 @@ def register(request):
                 'confirm_url': confirm_url,
             })
             send_mail(
-                subject='Подтверди свою почту — DayFlow',
+                subject='Confirm your email — DayFlow',
                 message=message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
