@@ -17,7 +17,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from .forms import RegisterForm, TaskForm
 from .models import Task, TaskCompletion
 
-WEEKDAYS_RU = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
+WEEKDAYS_EN = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 
 def register(request):
@@ -27,7 +27,7 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False  # ждём подтверждения почты
+            user.is_active = False  # waiting for email confirmation
             user.save()
 
             uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -47,6 +47,12 @@ def register(request):
                 recipient_list=[user.email],
             )
 
+            messages.success(
+                request,
+                f'We sent an email to {user.email}. '
+                'Check your inbox (and the Spam folder) to confirm your account.',
+                extra_tags='popup',
+            )
             return redirect(f"{reverse('check_email')}?email={quote(user.email)}")
     else:
         form = RegisterForm()
@@ -69,15 +75,16 @@ def confirm_email(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        messages.success(request, 'Почта подтверждена! Добро пожаловать в DayFlow 🎉')
+        messages.success(request, 'Email confirmed! Welcome to DayFlow 🎉')
         return redirect('task_list')
 
-    messages.error(request, 'Ссылка подтверждения недействительна или устарела.')
+    messages.error(request, 'The confirmation link is invalid or has expired.')
     return redirect('login')
 
 
 @login_required
 def task_list(request):
+    """Today's tasks — the home page."""
     today = date_cls.today()
     weekday = today.weekday()
 
@@ -95,7 +102,7 @@ def task_list(request):
         'tasks': todays_tasks,
         'completed_ids': completed_ids,
         'today': today,
-        'weekday_name': WEEKDAYS_RU[weekday],
+        'weekday_name': WEEKDAYS_EN[weekday],
         'done_count': len(completed_ids),
         'total_count': len(todays_tasks),
     })
@@ -116,6 +123,7 @@ def toggle_complete(request, task_id):
 
 @login_required
 def all_tasks(request):
+    """All of the user's tasks, for managing them."""
     tasks = Task.objects.filter(user=request.user).order_by('-is_recurring', 'time')
     return render(request, 'DayFlowApp/all_tasks.html', {'tasks': tasks})
 
@@ -128,12 +136,12 @@ def task_create(request):
             task = form.save(commit=False)
             task.user = request.user
             task.save()
-            messages.success(request, f'Задача «{task.title}» создана!')
+            messages.success(request, f'Task "{task.title}" created!')
             return redirect('task_list')
     else:
         form = TaskForm()
     return render(request, 'DayFlowApp/task_form.html', {
-        'form': form, 'heading': 'Новая задача', 'is_edit': False
+        'form': form, 'heading': 'New task', 'is_edit': False
     })
 
 
@@ -144,12 +152,12 @@ def task_edit(request, task_id):
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            messages.success(request, f'Задача «{task.title}» обновлена!')
+            messages.success(request, f'Task "{task.title}" updated!')
             return redirect('task_list')
     else:
         form = TaskForm(instance=task)
     return render(request, 'DayFlowApp/task_form.html', {
-        'form': form, 'heading': 'Редактировать задачу', 'is_edit': True
+        'form': form, 'heading': 'Edit task', 'is_edit': True
     })
 
 
@@ -159,7 +167,7 @@ def task_delete(request, task_id):
     if request.method == 'POST':
         title = task.title
         task.delete()
-        messages.success(request, f'Задача «{title}» удалена.')
+        messages.success(request, f'Task "{title}" deleted.')
         return redirect('all_tasks')
     return render(request, 'DayFlowApp/task_confirm_delete.html', {'task': task})
 

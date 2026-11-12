@@ -10,25 +10,25 @@ class TaskForm(forms.ModelForm):
         choices=[(str(k), v) for k, v in WEEKDAYS],
         widget=forms.CheckboxSelectMultiple,
         required=False,
-        label='Повторять по дням',
+        label='Repeat on',
     )
 
     class Meta:
         model = Task
         fields = ['title', 'description', 'time', 'is_recurring', 'repeat_days', 'date']
         labels = {
-            'title': 'Название задачи',
-            'description': 'Описание',
-            'time': 'Время',
-            'is_recurring': 'Повторяющаяся задача (как будильник)',
-            'date': 'Дата (для разовой задачи)',
+            'title': 'Task title',
+            'description': 'Description',
+            'time': 'Time',
+            'is_recurring': 'Recurring task (like an alarm)',
+            'date': 'Date (for one-time tasks)',
         }
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control', 'placeholder': 'Например: Тренировка в зале'
+                'class': 'form-control', 'placeholder': 'e.g. Gym workout'
             }),
             'description': forms.Textarea(attrs={
-                'class': 'form-control', 'rows': 3, 'placeholder': 'Детали задачи...'
+                'class': 'form-control', 'rows': 3, 'placeholder': 'Task details...'
             }),
             'time': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -51,11 +51,11 @@ class TaskForm(forms.ModelForm):
 
         if is_recurring and not repeat_days:
             raise forms.ValidationError(
-                'Выбери хотя бы один день недели для повторяющейся задачи.'
+                'Choose at least one weekday for a recurring task.'
             )
         if not is_recurring and not date:
             raise forms.ValidationError(
-                'Укажи дату для разовой (неповторяющейся) задачи.'
+                'Pick a date for a one-time task.'
             )
         return cleaned_data
 
@@ -85,15 +85,15 @@ class RegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({
-            'class': 'form-control', 'placeholder': 'Имя пользователя'
+            'class': 'form-control', 'placeholder': 'Username'
         })
         self.fields['username'].help_text = None
         self.fields['password1'].widget.attrs.update({
-            'class': 'form-control', 'placeholder': 'Пароль'
+            'class': 'form-control', 'placeholder': 'Password'
         })
         self.fields['password1'].help_text = None
         self.fields['password2'].widget.attrs.update({
-            'class': 'form-control', 'placeholder': 'Повторите пароль'
+            'class': 'form-control', 'placeholder': 'Confirm password'
         })
         self.fields['password2'].help_text = None
 
@@ -101,9 +101,9 @@ class RegisterForm(UserCreationForm):
         email = self.cleaned_data.get('email', '').strip().lower()
 
         if not email.endswith('@gmail.com'):
-            raise forms.ValidationError('Регистрация доступна только с почтой @gmail.com.')
+            raise forms.ValidationError('Only @gmail.com addresses can be used to sign up.')
 
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Пользователь с такой почтой уже зарегистрирован.')
+            raise forms.ValidationError('A user with this email already exists.')
 
         return email

@@ -1,10 +1,10 @@
 {% extends 'DayFlowApp/base.html' %}
-{% block title %}Регистрация — DayFlow{% endblock %}
+{% block title %}Sign up — DayFlow{% endblock %}
 {% block content %}
 <div class="auth-wrap">
   <div class="auth-card">
-    <div class="auth-title">Создать аккаунт 🌸</div>
-    <div class="auth-sub">Начни планировать свои дни красиво</div>
+    <div class="auth-title">Create an account 🌸</div>
+    <div class="auth-sub">Start planning your days beautifully</div>
 
     {% if form.non_field_errors %}
       <div class="alert-custom alert-error-custom mb-3">
@@ -42,11 +42,11 @@
           <div class="text-danger small mt-1">{{ error }}</div>
         {% endfor %}
       </div>
-      <button type="submit" class="btn-gradient border-0 w-100 justify-content-center">Зарегистрироваться</button>
+      <button type="submit" class="btn-gradient border-0 w-100 justify-content-center">Sign up</button>
     </form>
 
     <p class="text-center mt-4 mb-0" style="color:var(--text-muted);">
-      Уже есть аккаунт? <a class="plain-link" href="{% url 'login' %}">Войти</a>
+      Already have an account? <a class="plain-link" href="{% url 'login' %}">Log in</a>
     </p>
   </div>
 </div>

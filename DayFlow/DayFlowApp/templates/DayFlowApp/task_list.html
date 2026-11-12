@@ -1,17 +1,17 @@
 {% extends 'DayFlowApp/base.html' %}
-{% block title %}Сегодня — DayFlow{% endblock %}
+{% block title %}Today — DayFlow{% endblock %}
 {% block content %}
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
   <div>
-    <div class="hero-title">Привет, {{ user.username }} 🌸</div>
-    <div class="hero-sub">{{ weekday_name }}, {{ today|date:"d.m.Y" }}</div>
+    <div class="hero-title">Hi, {{ user.username }} 🌸</div>
+    <div class="hero-sub">{{ weekday_name }}, {{ today|date:"F j, Y" }}</div>
   </div>
   <div class="d-flex align-items-center gap-3">
     {% if total_count %}
       <div class="progress-pill">✅ {{ done_count }} / {{ total_count }}</div>
     {% endif %}
-    <a href="{% url 'task_create' %}" class="btn-gradient">+ Новая задача</a>
+    <a href="{% url 'task_create' %}" class="btn-gradient">+ New task</a>
   </div>
 </div>
 
@@ -28,16 +28,16 @@
         {% if task.is_recurring %}
           <span class="badge-recur">🔁 {{ task.repeat_days_display }}</span>
         {% else %}
-          <span class="badge-once">📅 разовая</span>
+          <span class="badge-once">📅 one-time</span>
         {% endif %}
       </div>
 
       <div class="task-actions">
-        <a href="{% url 'task_delete' task.id %}" class="icon-btn" title="Удалить">🗑️</a>
-        <a href="{% url 'task_edit' task.id %}" class="icon-btn" title="Редактировать">✏️</a>
+        <a href="{% url 'task_delete' task.id %}" class="icon-btn" title="Delete">🗑️</a>
+        <a href="{% url 'task_edit' task.id %}" class="icon-btn" title="Edit">✏️</a>
         <form action="{% url 'toggle_complete' task.id %}" method="post" class="d-inline">
           {% csrf_token %}
-          <button type="submit" class="check-circle {% if task.id in completed_ids %}checked{% endif %}" title="Отметить выполненной">
+          <button type="submit" class="check-circle {% if task.id in completed_ids %}checked{% endif %}" title="Mark as done">
             {% if task.id in completed_ids %}✓{% endif %}
           </button>
         </form>
@@ -47,8 +47,8 @@
 {% else %}
   <div class="glass-card empty-state">
     <div class="emoji">🌷</div>
-    <p class="mb-3">На сегодня задач нет. Самое время добавить что-то приятное!</p>
-    <a href="{% url 'task_create' %}" class="btn-gradient">+ Добавить задачу</a>
+    <p class="mb-3">No tasks for today. A great time to add something nice!</p>
+    <a href="{% url 'task_create' %}" class="btn-gradient">+ Add task</a>
   </div>
 {% endif %}
 

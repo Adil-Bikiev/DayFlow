@@ -1,21 +1,21 @@
 {% extends 'DayFlowApp/base.html' %}
-{% block title %}Проверь почту — DayFlow{% endblock %}
+{% block title %}Check your email — DayFlow{% endblock %}
 {% block content %}
 <div class="auth-wrap">
   <div class="auth-card" style="text-align:center;">
     <div style="font-size:3rem;margin-bottom:10px;">📬</div>
-    <div class="auth-title">Проверь почту</div>
+    <div class="auth-title">Check your email</div>
     <div class="auth-sub">
-      Мы отправили письмо с подтверждением
-      {% if email %}на <strong>{{ email }}</strong>{% else %}на твою почту{% endif %}.
-      <br>Перейди по ссылке из письма, чтобы активировать аккаунт.
+      We sent a confirmation email
+      {% if email %}to <strong>{{ email }}</strong>{% else %}to your address{% endif %}.
+      <br>Follow the link in the email to activate your account.
     </div>
 
-    <a href="{% url 'login' %}" class="btn-soft">← Вернуться ко входу</a>
+    <a href="{% url 'login' %}" class="btn-soft">← Back to log in</a>
 
     <p class="mt-4 mb-0" style="color:var(--text-muted);font-size:0.85rem;">
-      Не пришло письмо? Проверь папку «Спам» или
-      <a class="plain-link" href="{% url 'register' %}">зарегистрируйся заново</a>.
+      Didn't get the email? Check your Spam folder or
+      <a class="plain-link" href="{% url 'register' %}">sign up again</a>.
     </p>
   </div>
 </div>

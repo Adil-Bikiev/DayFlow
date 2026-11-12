@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,109 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="{% static 'DayFlowApp/css/style.css' %}" rel="stylesheet">
+
+  <style>
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(69, 58, 92, 0.35);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      animation: popup-fade 0.2s ease;
+    }
+
+    .popup-card {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      padding: 42px 32px 32px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 28px;
+      box-shadow: 0 25px 60px rgba(155, 107, 255, 0.35);
+      overflow: hidden;
+      animation: popup-pop 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    }
+
+    .popup-card::before {
+      content: "";
+      position: absolute;
+      top: -70px;
+      left: -70px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd6ec, #d9c6ff);
+      opacity: 0.55;
+      filter: blur(30px);
+    }
+
+    .popup-card > * { position: relative; }
+
+    .popup-x {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 50%;
+      background: #f3ecff;
+      color: #8b7fa3;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .popup-x:hover { background: #e8dcff; color: #9b6bff; }
+
+    .popup-icon {
+      width: 78px;
+      height: 78px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.3rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffd6ec, #d9c6ff);
+      box-shadow: 0 10px 24px rgba(155, 107, 255, 0.3);
+    }
+
+    .popup-title {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #453a5c;
+    }
+
+    .popup-text {
+      margin-bottom: 26px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #8b7fa3;
+      word-break: break-word;
+    }
+
+    .popup-card .btn-gradient {
+      width: 100%;
+      justify-content: center;
+    }
+
+    @keyframes popup-fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes popup-pop {
+      from { opacity: 0; transform: scale(0.9) translateY(14px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  </style>
 </head>
 <body>
   <div class="bg-blob blob-1"></div>
@@ -19,16 +122,16 @@
       <a class="brand" href="{% if user.is_authenticated %}{% url 'task_list' %}{% else %}{% url 'login' %}{% endif %}">✨ DayFlow</a>
       <div class="d-flex align-items-center gap-2">
         {% if user.is_authenticated %}
-          <a class="nav-link-custom" href="{% url 'task_list' %}">Сегодня</a>
-          <a class="nav-link-custom" href="{% url 'all_tasks' %}">Все задачи</a>
+          <a class="nav-link-custom" href="{% url 'task_list' %}">Today</a>
+          <a class="nav-link-custom" href="{% url 'all_tasks' %}">All tasks</a>
           <span class="nav-link-custom">👋 {{ user.username }}</span>
           <form action="{% url 'logout' %}" method="post" class="d-inline">
             {% csrf_token %}
-            <button type="submit" class="nav-link-custom border-0 bg-transparent">Выйти</button>
+            <button type="submit" class="nav-link-custom border-0 bg-transparent">Log out</button>
           </form>
         {% else %}
-          <a class="nav-link-custom" href="{% url 'login' %}">Войти</a>
-          <a class="nav-link-custom" href="{% url 'register' %}">Регистрация</a>
+          <a class="nav-link-custom" href="{% url 'login' %}">Log in</a>
+          <a class="nav-link-custom" href="{% url 'register' %}">Sign up</a>
         {% endif %}
       </div>
     </div>
@@ -37,13 +140,43 @@
   <div class="page-wrap">
     {% if messages %}
       {% for message in messages %}
-        <div class="alert-custom {% if message.tags == 'success' %}alert-success-custom{% else %}alert-error-custom{% endif %} mb-3">
-          {{ message }}
-        </div>
+        {% if 'popup' in message.extra_tags %}
+          <div class="popup-overlay" id="popup-overlay">
+            <div class="popup-card">
+              <button type="button" class="popup-x" id="popup-x" aria-label="Close">×</button>
+              <div class="popup-icon">📬</div>
+              <div class="popup-title">Check your email</div>
+              <div class="popup-text">{{ message }}</div>
+              <button type="button" class="btn-gradient border-0" id="popup-close">Got it</button>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert-custom {% if message.tags == 'success' %}alert-success-custom{% else %}alert-error-custom{% endif %} mb-3">
+            {{ message }}
+          </div>
+        {% endif %}
       {% endfor %}
     {% endif %}
 
     {% block content %}{% endblock %}
   </div>
+
+  <script>
+    (function () {
+      var overlay = document.getElementById('popup-overlay');
+      if (!overlay) return;
+
+      function closePopup() { overlay.remove(); }
+
+      document.getElementById('popup-close').addEventListener('click', closePopup);
+      document.getElementById('popup-x').addEventListener('click', closePopup);
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closePopup();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closePopup();
+      });
+    })();
+  </script>
 </body>
 </html>
