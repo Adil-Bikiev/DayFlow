@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 from decouple import config, Csv
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,8 +22,23 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".vercel.app",
+]
+
+
+# Automatically allow the current Vercel deployment hostname
+vercel_url = os.environ.get("VERCEL_URL")
+if vercel_url:
+    ALLOWED_HOSTS.append(vercel_url)
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
+]
 
 # Application definition
 
